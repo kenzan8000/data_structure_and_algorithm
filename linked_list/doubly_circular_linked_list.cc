@@ -187,5 +187,7 @@ int main() {
     std::cout << "Removed (index=" << index << "):" << std::endl;
     linkedList->display();
 
+    delete linkedList;
+
     return 0;
 };
