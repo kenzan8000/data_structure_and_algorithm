@@ -1,41 +1,38 @@
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
+//#include <cstdlib>
+//#include <ctime>
+#include <string>
 
 
 // Stack
 
-struct Element {
-    int value;
-    char op[1];
-};
-
 class Stack {
 public:
-    Element *elements;
+    char *elements;
     int top;
     int size;
+    std::string name;
 
-    Stack(const int size);
+    Stack(const int size, const std::string name);
     ~Stack();
 
     /**
      * Pushing (storing) an element on the stack.
-     * @param element Element
+     * @param element char
      **/
-    void push(Element element);
+    void push(char element);
 
     /**
      * Removing (accessing) an element from the stack.
-     * @return element Element
+     * @return element char
      **/
-    Element pop();
+    char pop();
 
     /**
      * Get the top data element of the stack, without removing it.
-     * @return element Element
+     * @return element char
      **/
-     Element peek();
+     char peek();
 
     /**
      * Check if stack is full.
@@ -52,34 +49,35 @@ public:
     /**
      * Displays the complete elements.
      **/
-    void display();
+    void displayStack();
 
 };
 
-Stack::Stack(const int size) {
-    this->elements = new Element[size];
+Stack::Stack(const int size, const std::string name) {
+    this->elements = new char[size];
     this->top = -1;
     this->size = size;
+    this->name = name;
 };
 
 Stack::~Stack() {
     delete[] this->elements;
 };
 
-void Stack::push(Element element) {
+void Stack::push(char element) {
     if (this->isFull()) { return; }
 
     this->top++;
     this->elements[this->top] = element;
 };
 
-Element Stack::pop() {
-    Element element = this->peek();
+char Stack::pop() {
+    char element = this->peek();
     this->top--;
     return element;
 };
 
-Element Stack::peek() {
+char Stack::peek() {
     return this->elements[this->top];
 };
 
@@ -91,65 +89,71 @@ bool Stack::isEmpty() {
     return (this->top < 0);
 };
 
-void Stack::display() {
-    std::cout << "Stack:" << std::endl;
+void Stack::displayStack() {
+    std::cout << this->name << std::endl;
     for (int i = this->size-1; i >= 0; i--) {
         if (i > this->top) {
             std::cout << "[   ]" << std::endl;
         }
         else {
-            if (this->elements[i].op != (char *)NULL) {
-                std::cout << "[ " << this->elements[i].op[0] << " ]" << std::endl;
-            }
-            else {
-                std::cout << "[ " << this->elements[i].value << " ]" << std::endl;
-            }
+            std::cout << "[ " << this->elements[i] << " ]" << std::endl;
         }
     }
 };
 
-class ExpressionParsing: public Stack {
-    public:
 
-    ExpressionParsing(const int size);
-    ~ExpressionParsing();
+bool isOperator(char element) {
+    return (element == '+' || element == '-' || element == '*' || element == '/' || element =='^');
+}
 
-    /**
-     * Calculate
-     **/
-    void calculate();
-};
+bool isOperand(char element) {
+    return (!isOperator(element) && element != '(' && element != ')');
+}
 
-ExpressionParsing::ExpressionParsing(const int size) : Stack(size) {
-};
-
-ExpressionParsing::~ExpressionParsing() {
-};
-
-void ExpressionParsing::calculate() {
-};
+int associativity(char element) {
+    int value = 0;
+    switch (element) {
+        case '+':
+        case '-':
+            value = 1;
+            break;
+        case '*':
+        case '/':
+            value = 2;
+            break;
+        case '^':
+            value = 3;
+            break;
+    }
+    return value;
+}
 
 
 int main() {
-    std::srand(std::time(0));
+    std::string infix = "1+2";
 
-    const char *oprators = "+-*/";
-    const int size = 3;
-    Element infixNotation[size];
-    ExpressionParsing *expressionParsing = new ExpressionParsing(size);
-    for (int i = 0; i < size; i++) {
-        Element element;
-        if (i % 2 == 0) { // number
-            element.value = std::rand() % 9 + 1;
+    // infix to prefix notation
+    Stack *stack = new Stack(infix.length(), "Stack");
+    Stack *prefix = new Stack(infix.length(), "Prefix");
+    for(int i = infix.length()-1; i >= 0; i--) {
+        if (isOperand(infix[i])) {
+            prefix->push(infix[i]);
         }
-        else { // operator
-            element.op[0] = oprators[std::rand() % 4];
+        else if (isOperator(infix[i])) {
+            stack->push(infix[i]);
         }
-        infixNotation[i] = element;
+        else {
+        }
+        std::cout << "-------------------" << std::endl;
+        prefix->displayStack();
+        stack->displayStack();
     }
-    expressionParsing->display();
-
-    delete expressionParsing;
+    while (!stack->isEmpty()) {
+        std::cout << "-------------------" << std::endl;
+        prefix->push(stack->pop());
+        prefix->displayStack();
+        stack->displayStack();
+    }
 
     return 0;
 };
