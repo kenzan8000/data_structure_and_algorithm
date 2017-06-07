@@ -132,57 +132,49 @@ int associativity(char element) {
     return value;
 }
 
+int toInt(char element) {
+    return (element - '0');
+}
+
 
 int main() {
-    std::string infix = "(A+B^C)*D+E^5";
+    std::string infix = "(1+2^3)*4+5^6";
 
-    // infix to prefix notation
     Stack *stack = new Stack(infix.length(), "Stack");
-    Stack *prefix = new Stack(infix.length(), "Prefix");
+
+    // infix to postfix notation
+    Stack *postfix = new Stack(infix.length(), "postfix");
     for(int i = infix.length()-1; i >= 0; i--) {
         char symbol = infix[i];
 
         // when number
         if (isOperand(symbol)) {
-            prefix->push(symbol);
+            postfix->push(symbol);
 
             std::cout << "-------------------" << std::endl;
-            prefix->displayStack();
+            postfix->displayStack();
             stack->displayStack();
         }
         else {
             if (symbol == '(') {
-                //symbol = ')';
-                //stack->push(symbol);
-
                 while (!stack->isEmpty() && stack->peek() != ')') {
-                    prefix->push(stack->pop());
+                    postfix->push(stack->pop());
 
                     std::cout << "-------------------" << std::endl;
-                    prefix->displayStack();
+                    postfix->displayStack();
                     stack->displayStack();
                 }
                 stack->pop();
 
                 std::cout << "-------------------" << std::endl;
-                prefix->displayStack();
+                postfix->displayStack();
                 stack->displayStack();
             }
             else if (symbol == ')') {
-                //symbol = '(';
-                //while (!stack->isEmpty() && stack->peek() != ')') {
-                //    prefix->push(stack->pop());
-
-                //    std::cout << "-------------------" << std::endl;
-                //    prefix->displayStack();
-                //    stack->displayStack();
-                //}
-                //stack->pop();
-
                 stack->push(symbol);
 
                 std::cout << "-------------------" << std::endl;
-                prefix->displayStack();
+                postfix->displayStack();
                 stack->displayStack();
             }
             else {
@@ -190,37 +182,70 @@ int main() {
                     stack->push(symbol);
 
                     std::cout << "-------------------" << std::endl;
-                    prefix->displayStack();
+                    postfix->displayStack();
                     stack->displayStack();
                 }
                 else {
                     while (!stack->isEmpty() && associativity(stack->peek()) >= associativity(symbol)) {
-                        prefix->push(stack->pop());
+                        postfix->push(stack->pop());
 
                         std::cout << "-------------------" << std::endl;
-                        prefix->displayStack();
+                        postfix->displayStack();
                         stack->displayStack();
                     }
                     stack->push(symbol);
 
                     std::cout << "-------------------" << std::endl;
-                    prefix->displayStack();
+                    postfix->displayStack();
                     stack->displayStack();
                 }
             }
         }
         std::cout << "-------------------" << std::endl;
-        prefix->displayStack();
+        postfix->displayStack();
         stack->displayStack();
     }
 	while (!stack->isEmpty()) {
 		char symbol = stack->pop();
-        prefix->push(symbol);
+        postfix->push(symbol);
 
         std::cout << "-------------------" << std::endl;
-        prefix->displayStack();
+        postfix->displayStack();
         stack->displayStack();
 	}
+
+    // TODO stack can be used int and char -> C++ template?
+/*
+    // using postfix for caliculation
+	while (!postfix->isEmpty()) {
+        char symbol = postfix->pop();
+        if (isOperand(symbol)) {
+            stack->push(symbol);
+        }
+        else {
+            int accumulator = 0;
+            switch (symbol) {
+                case '+':
+                    accumulator = toInt(stack->pop()) + toInt(stack->pop());
+                    break;
+                case '-':
+                    accumulator = toInt(stack->pop()) - toInt(stack->pop());
+                    break;
+                case '*':
+                    accumulator = toInt(stack->pop()) * toInt(stack->pop());
+                    break;
+                case '/':
+                    accumulator = toInt(stack->pop()) / toInt(stack->pop());
+                    break;
+                case '^':
+                    accumulator = toInt(stack->pop()) ^ toInt(stack->pop());
+                    break;
+            }
+            stack->push(accumulator);
+        }
+    }
+    std::cout << "-------------------" << std::endl;
+*/
 
     return 0;
 };
