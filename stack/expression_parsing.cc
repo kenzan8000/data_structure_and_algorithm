@@ -111,7 +111,7 @@ bool isOperand(char element) {
 }
 
 int associativity(char element) {
-    int value = 0;
+    int value = -1;
     switch (element) {
         case '+':
         case '-':
@@ -124,36 +124,103 @@ int associativity(char element) {
         case '^':
             value = 3;
             break;
+        case '(':
+        case ')':
+            value = 0;
+            break;
     }
     return value;
 }
 
 
 int main() {
-    std::string infix = "1+2";
+    std::string infix = "(A+B^C)*D+E^5";
 
     // infix to prefix notation
     Stack *stack = new Stack(infix.length(), "Stack");
     Stack *prefix = new Stack(infix.length(), "Prefix");
     for(int i = infix.length()-1; i >= 0; i--) {
-        if (isOperand(infix[i])) {
-            prefix->push(infix[i]);
-        }
-        else if (isOperator(infix[i])) {
-            stack->push(infix[i]);
+        char symbol = infix[i];
+
+        // when number
+        if (isOperand(symbol)) {
+            prefix->push(symbol);
+
+            std::cout << "-------------------" << std::endl;
+            prefix->displayStack();
+            stack->displayStack();
         }
         else {
+            if (symbol == '(') {
+                //symbol = ')';
+                //stack->push(symbol);
+
+                while (!stack->isEmpty() && stack->peek() != ')') {
+                    prefix->push(stack->pop());
+
+                    std::cout << "-------------------" << std::endl;
+                    prefix->displayStack();
+                    stack->displayStack();
+                }
+                stack->pop();
+
+                std::cout << "-------------------" << std::endl;
+                prefix->displayStack();
+                stack->displayStack();
+            }
+            else if (symbol == ')') {
+                //symbol = '(';
+                //while (!stack->isEmpty() && stack->peek() != ')') {
+                //    prefix->push(stack->pop());
+
+                //    std::cout << "-------------------" << std::endl;
+                //    prefix->displayStack();
+                //    stack->displayStack();
+                //}
+                //stack->pop();
+
+                stack->push(symbol);
+
+                std::cout << "-------------------" << std::endl;
+                prefix->displayStack();
+                stack->displayStack();
+            }
+            else {
+                if (associativity(stack->peek()) <= associativity(symbol)) {
+                    stack->push(symbol);
+
+                    std::cout << "-------------------" << std::endl;
+                    prefix->displayStack();
+                    stack->displayStack();
+                }
+                else {
+                    while (!stack->isEmpty() && associativity(stack->peek()) >= associativity(symbol)) {
+                        prefix->push(stack->pop());
+
+                        std::cout << "-------------------" << std::endl;
+                        prefix->displayStack();
+                        stack->displayStack();
+                    }
+                    stack->push(symbol);
+
+                    std::cout << "-------------------" << std::endl;
+                    prefix->displayStack();
+                    stack->displayStack();
+                }
+            }
         }
         std::cout << "-------------------" << std::endl;
         prefix->displayStack();
         stack->displayStack();
     }
-    while (!stack->isEmpty()) {
+	while (!stack->isEmpty()) {
+		char symbol = stack->pop();
+        prefix->push(symbol);
+
         std::cout << "-------------------" << std::endl;
-        prefix->push(stack->pop());
         prefix->displayStack();
         stack->displayStack();
-    }
+	}
 
     return 0;
 };
