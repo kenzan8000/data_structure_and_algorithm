@@ -6,9 +6,10 @@
 
 // Stack
 
+template <class T>
 class Stack {
 public:
-    char *elements;
+    T *elements;
     int top;
     int size;
     std::string name;
@@ -20,19 +21,20 @@ public:
      * Pushing (storing) an element on the stack.
      * @param element char
      **/
-    void push(char element);
+    void push(T element);
 
     /**
      * Removing (accessing) an element from the stack.
      * @return element char
      **/
-    char pop();
+    T pop();
 
     /**
      * Get the top data element of the stack, without removing it.
      * @return element char
      **/
-     char peek();
+     //char peek();
+     T peek();
 
     /**
      * Check if stack is full.
@@ -53,43 +55,51 @@ public:
 
 };
 
-Stack::Stack(const int size, const std::string name) {
-    this->elements = new char[size];
+template <class T>
+Stack<T>::Stack(const int size, const std::string name) {
+    this->elements = new T[size];
     this->top = -1;
     this->size = size;
     this->name = name;
 };
 
-Stack::~Stack() {
+template <class T>
+Stack<T>::~Stack() {
     delete[] this->elements;
 };
 
-void Stack::push(char element) {
+template <class T>
+void Stack<T>::push(T element) {
     if (this->isFull()) { return; }
 
     this->top++;
     this->elements[this->top] = element;
 };
 
-char Stack::pop() {
-    char element = this->peek();
+template <class T>
+T Stack<T>::pop() {
+    T element = this->peek();
     this->top--;
     return element;
 };
 
-char Stack::peek() {
+template <class T>
+T Stack<T>::peek() {
     return this->elements[this->top];
 };
 
-bool Stack::isFull() {
+template <class T>
+bool Stack<T>::isFull() {
     return (this->top >= this->size - 1);
 };
 
-bool Stack::isEmpty() {
+template <class T>
+bool Stack<T>::isEmpty() {
     return (this->top < 0);
 };
 
-void Stack::displayStack() {
+template <class T>
+void Stack<T>::displayStack() {
     std::cout << this->name << std::endl;
     for (int i = this->size-1; i >= 0; i--) {
         if (i > this->top) {
@@ -140,10 +150,12 @@ int toInt(char element) {
 int main() {
     std::string infix = "(1+2^3)*4+5^6";
 
-    Stack *stack = new Stack(infix.length(), "Stack");
+    //Stack *stack = new Stack(infix.length(), "Stack");
+    Stack<char> *stack = new Stack<char>(infix.length(), "Stack");
 
     // infix to postfix notation
-    Stack *postfix = new Stack(infix.length(), "postfix");
+    //Stack *postfix = new Stack(infix.length(), "postfix");
+    Stack<char> *postfix = new Stack<char>(infix.length(), "postfix");
     for(int i = infix.length()-1; i >= 0; i--) {
         char symbol = infix[i];
 
